@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { z } from 'zod';
+import { useAuth } from '../../context/authContext';
 
 // Zod validation schema
 const signInSchema = z.object({
@@ -9,7 +12,7 @@ const signInSchema = z.object({
     .min(3, 'Email must be at least 3 characters')
     .max(100, 'Email must not exceed 100 characters'),
   password: z.string()
-    .min(8, 'Password must be at least 8 characters')
+    .min(6, 'Password must be at least 6 characters')
     .max(100, 'Password must not exceed 100 characters'),
 });
 
@@ -17,12 +20,14 @@ type SignInFormData = z.infer<typeof signInSchema>;
 type FormErrors = Partial<Record<keyof SignInFormData, string>>;
 
 export default function SignInPage() {
+  const router = useRouter();
+  const { login, isLoading, error } = useAuth();
+  
   const [formData, setFormData] = useState<SignInFormData>({
     email: '',
     password: '',
   });
   const [errors, setErrors] = useState<FormErrors>({});
-  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,16 +58,11 @@ export default function SignInPage() {
       return;
     }
 
-    setIsLoading(true);
-    
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Sign in successful:', result.data);
-    } catch (error) {
-      console.error('Sign in failed:', error);
+      await login(result.data.email, result.data.password);
+      router.push('/dashboard');
+    } catch (err) {
       setErrors({ email: 'Invalid credentials. Please try again.' });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -82,16 +82,30 @@ export default function SignInPage() {
           </div>
 
           {/* Form */}
-          <div className="space-y-6">
-            {/* Username Field */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Display auth error */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                <div className="flex">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <div className="ml-3">
+                    <p className="text-sm text-red-800">{error}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Email Field */}
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-                Username
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                Email
               </label>
               <input
                 id="email"
                 name="email"
-                type="text"
+                type="email"
                 autoComplete="email"
                 required
                 value={formData.email}
@@ -162,25 +176,9 @@ export default function SignInPage() {
               )}
             </div>
 
-            {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                  Remember me
-                </label>
-              </div>
-            </div>
-
             {/* Submit Button */}
             <button
-              type="button"
-              onClick={handleSubmit}
+              type="submit"
               disabled={isLoading}
               className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
             >
@@ -193,23 +191,20 @@ export default function SignInPage() {
                 'Sign in'
               )}
             </button>
-          </div>
+          </form>
 
           {/* Sign Up Link */}
           <p className="mt-6 text-center text-sm text-gray-600">
             Don't have an account?{' '}
-            <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500 transition">
+            <Link href="/sign-up" className="font-medium text-indigo-600 hover:text-indigo-500 transition">
               Sign up
-            </a>
+            </Link>
           </p>
         </div>
 
         {/* Footer */}
         <p className="text-center text-xs text-gray-500">
-          By signing in, you agree to our{' '}
-          <a href="#" className="underline hover:text-gray-700">Terms</a>
-          {' '}and{' '}
-          <a href="#" className="underline hover:text-gray-700">Privacy Policy</a>
+          CAA Security Demo - Confidentiality, Availability, Accountability
         </p>
       </div>
     </div>

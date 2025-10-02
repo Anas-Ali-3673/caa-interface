@@ -8,12 +8,10 @@ import { useAuth } from '../../context/authContext';
 
 // Zod validation schema
 const signInSchema = z.object({
-  email: z.email()
-    .min(3, 'Email must be at least 3 characters')
-    .max(100, 'Email must not exceed 100 characters'),
+  email: z.string()
+    .email('Please enter a valid email address'),
   password: z.string()
-    .min(6, 'Password must be at least 6 characters')
-    .max(100, 'Password must not exceed 100 characters'),
+    .min(6, 'Password must be at least 6 characters'),
 });
 
 type SignInFormData = z.infer<typeof signInSchema>;

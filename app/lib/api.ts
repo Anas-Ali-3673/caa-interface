@@ -93,7 +93,7 @@ export const apiClient = new ApiClient();
 // Helper functions for common operations
 export const authAPI = {
   signIn: (email: string, password: string) =>
-    apiClient.post('/auth/signin', { email, password }),
+    apiClient.post('api/auth/signin', { email, password }),
   
   signUp: (userData: { name: string; email: string; password: string; role?: string }) =>
     apiClient.post('/auth/signup', userData),

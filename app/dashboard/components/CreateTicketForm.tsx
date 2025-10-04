@@ -28,7 +28,7 @@ export default function CreateTicketForm({ onSubmit, onCancel }: CreateTicketFor
 
   return (
     <div className="mb-6 bg-white rounded-lg shadow p-6">
-      <h2 className="text-lg font-medium mb-4">Create New Ticket</h2>
+      <h2 className="text-lg font-medium mb-4 text-gray-600">Create New Ticket</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -39,7 +39,7 @@ export default function CreateTicketForm({ onSubmit, onCancel }: CreateTicketFor
             required
             value={newTicket.title}
             onChange={(e) => setNewTicket(prev => ({...prev, title: e.target.value}))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border text-gray-600 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
         
@@ -52,7 +52,7 @@ export default function CreateTicketForm({ onSubmit, onCancel }: CreateTicketFor
             rows={3}
             value={newTicket.description}
             onChange={(e) => setNewTicket(prev => ({...prev, description: e.target.value}))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border text-gray-600 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
         
@@ -63,7 +63,7 @@ export default function CreateTicketForm({ onSubmit, onCancel }: CreateTicketFor
           <select
             value={newTicket.priority}
             onChange={(e) => setNewTicket(prev => ({...prev, priority: e.target.value as any}))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border border-gray-300 text-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="low">Low</option>
             <option value="medium">Medium</option>

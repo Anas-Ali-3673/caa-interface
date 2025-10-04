@@ -93,7 +93,7 @@ export default function TicketsList({ tickets, loading, user, onUpdateStatus, on
                       <select
                         value={ticket.status}
                         onChange={(e) => onUpdateStatus(ticket._id, e.target.value)}
-                        className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="text-sm border border-gray-300 rounded px-2 py-1 text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       >
                         <option value="open">Open</option>
                         <option value="in-progress">In Progress</option>
@@ -105,13 +105,12 @@ export default function TicketsList({ tickets, loading, user, onUpdateStatus, on
                       Status: <span className="font-medium capitalize">{ticket.status.replace('-', ' ')}</span>
                     </div>
                   )}
-                  
-                  {/* Delete Button - Admin or Creator */}
-                  {(user.role === 'Admin' || 
-                    (typeof ticket.createdBy === 'string' ? ticket.createdBy === user._id : ticket.createdBy._id === user._id)) && (
+
+                  {/* Delete Button - Admin Only */}
+                  {(user.role === 'Admin') && (
                     <button
                       onClick={() => onDeleteTicket(ticket._id)}
-                      className="text-red-600 hover:text-red-800 text-sm font-medium"
+                      className="text-red-600 hover:text-red-800 text-sm font-medium border border-red-600 hover:border-red-800 px-2 py-1 rounded"
                     >
                       Delete
                     </button>

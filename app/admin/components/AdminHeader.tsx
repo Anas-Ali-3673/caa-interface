@@ -18,7 +18,7 @@ export default function AdminHeader({ userEmail }: AdminHeaderProps) {
               onClick={() => router.push('/dashboard')}
               className="mr-4 text-gray-600 hover:text-gray-900"
             >
-              ← Back to Dashboard
+              ←
             </button>
             <h1 className="text-xl font-semibold text-gray-900">
               Admin Panel

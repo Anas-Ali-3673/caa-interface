@@ -15,7 +15,7 @@ interface AuditLogsProps {
   auditLogs: AuditLog[];
 }
 
-const LOGS_PER_PAGE = 2;
+const LOGS_PER_PAGE = 3;
 
 export default function AuditLogs({ auditLogs }: AuditLogsProps) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -95,37 +95,31 @@ export default function AuditLogs({ auditLogs }: AuditLogsProps) {
                   Showing {((currentPage - 1) * LOGS_PER_PAGE) + 1} to {Math.min(currentPage * LOGS_PER_PAGE, auditLogs.length)} of {auditLogs.length} logs
                 </div>
                 
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-4">
                   <button
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="px-3 py-1 text-sm border rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2 border rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600"
+                    aria-label="Previous page"
                   >
-                    Previous
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
                   </button>
                   
-                  <div className="flex items-center space-x-1">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <button
-                        key={page}
-                        onClick={() => goToPage(page)}
-                        className={`px-3 py-1 text-sm border rounded ${
-                          currentPage === page
-                            ? 'bg-indigo-600 text-white border-indigo-600'
-                            : 'hover:bg-gray-50'
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                  </div>
+                  <span className="text-sm text-gray-700">
+                    Page {currentPage} of {totalPages}
+                  </span>
                   
                   <button
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="px-3 py-1 text-sm border rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2 border rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600"
+                    aria-label="Next page"
                   >
-                    Next
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </button>
                 </div>
               </div>

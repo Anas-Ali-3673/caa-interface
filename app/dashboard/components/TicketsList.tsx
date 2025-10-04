@@ -33,7 +33,7 @@ export default function TicketsList({ tickets, loading, user, onUpdateStatus, on
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow">
-        <div className="p-6 text-center">Loading tickets...</div>
+        <div className="p-6 text-center text-gray-600" >Loading tickets...</div>
       </div>
     );
   }

@@ -2,7 +2,7 @@
 
 interface AuditLog {
   _id: string;
-  userId: string;
+  userId: string | { _id: string; name?: string; email: string };
   action: string;
   details: any;
   timestamp: string;
@@ -50,10 +50,10 @@ export default function AuditLogs({ auditLogs }: AuditLogsProps) {
                     </div>
                     
                     <div className="mt-2 text-sm text-gray-600">
-                      <strong>User ID:</strong> {log.userId}
+                      <strong>User:</strong> {typeof log.userId === 'string' ? log.userId : (log.userId.name || log.userId.email)}
                     </div>
                     
-                    {log.details && (
+                    {log.details && typeof log.details === 'object' && (
                       <div className="mt-2">
                         <strong className="text-sm text-gray-700">Details:</strong>
                         <pre className="mt-1 text-xs bg-gray-50 p-2 rounded overflow-x-auto">

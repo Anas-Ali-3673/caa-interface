@@ -56,7 +56,7 @@ export default function AuditLogs({ auditLogs }: AuditLogsProps) {
                     {log.details && typeof log.details === 'object' && (
                       <div className="mt-2">
                         <strong className="text-sm text-gray-700">Details:</strong>
-                        <pre className="mt-1 text-xs bg-gray-50 p-2 rounded overflow-x-auto">
+                        <pre className="mt-1 text-xs bg-gray-50 text-gray-600 p-2 rounded overflow-x-auto">
                           {JSON.stringify(log.details, null, 2)}
                         </pre>
                       </div>

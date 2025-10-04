@@ -42,7 +42,7 @@ export default function TicketsList({ tickets, loading, user, onUpdateStatus, on
     <div className="bg-white rounded-lg shadow">
       <div className="px-6 py-4 border-b border-gray-200">
         <h2 className="text-lg font-medium text-gray-900">
-          {user.role === 'Admin' ? 'All Tickets' : 'My Tickets'}
+          {(user.role === 'Admin' || user.role === 'admin') ? 'All Tickets' : 'My Tickets'}
         </h2>
       </div>
       
@@ -63,7 +63,7 @@ export default function TicketsList({ tickets, loading, user, onUpdateStatus, on
                   
                   <div className="mt-3 flex items-center space-x-4 text-sm text-gray-500">
                     <span>Created: {new Date(ticket.createdAt).toLocaleDateString()}</span>
-                    {user.role === 'Admin' && typeof ticket.createdBy === 'object' && (
+                    {(user.role === 'Admin' || user.role === 'admin') && typeof ticket.createdBy === 'object' && (
                       <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
                         By: {ticket.createdBy.name || ticket.createdBy.email}
                       </span>
@@ -87,7 +87,7 @@ export default function TicketsList({ tickets, loading, user, onUpdateStatus, on
                 
                 <div className="ml-4 flex flex-col space-y-2">
                   {/* Status Update - Admin Only */}
-                  {user.role === 'Admin' ? (
+                  {(user.role === 'Admin' || user.role === 'admin') ? (
                     <div className="flex items-center space-x-2">
                       <span className="text-xs text-gray-500">Status:</span>
                       <select
@@ -107,7 +107,7 @@ export default function TicketsList({ tickets, loading, user, onUpdateStatus, on
                   )}
 
                   {/* Delete Button - Admin Only */}
-                  {(user.role === 'Admin') && (
+                  {(user.role === 'Admin' || user.role === 'admin') && (
                     <button
                       onClick={() => onDeleteTicket(ticket._id)}
                       className="text-red-600 hover:text-red-800 text-sm font-medium border border-red-600 hover:border-red-800 px-2 py-1 rounded"

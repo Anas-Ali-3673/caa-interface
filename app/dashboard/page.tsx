@@ -102,7 +102,7 @@ export default function Dashboard() {
   };
 
   const updateTicketStatus = async (ticketId: string, status: string) => {
-    if (!token || user?.role !== 'Admin') {
+    if (!token || (user?.role !== 'Admin' && user?.role !== 'admin')) {
       setError('Only admins can update ticket status');
       return;
     }
@@ -174,7 +174,7 @@ export default function Dashboard() {
         <ErrorDisplay error={error} onDismiss={() => setError(null)} />
 
         {/* Create Ticket Button - Users Only */}
-        {user.role !== 'Admin' && (
+        {user.role !== 'Admin' && user.role !== 'admin' && (
           <div className="mb-6">
             <button
               onClick={() => setShowCreateForm(true)}
@@ -186,7 +186,7 @@ export default function Dashboard() {
         )}
 
         {/* Create Ticket Form - Users Only */}
-        {user.role !== 'Admin' && showCreateForm && (
+        {(user.role !== 'Admin' && user.role !== 'admin') && showCreateForm && (
           <CreateTicketForm 
             onSubmit={createTicket}
             onCancel={() => setShowCreateForm(false)}
@@ -194,7 +194,7 @@ export default function Dashboard() {
         )}
 
         {/* Admin View Info */}
-        {user.role === 'Admin' && (
+        {(user.role === 'Admin' || user.role === 'admin') && (
           <div className="mb-6 bg-blue-50 border border-blue-200 rounded-md p-4">
             <div className="flex items-center">
               <svg className="h-5 w-5 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">

@@ -22,13 +22,13 @@ export default function AdminPanel() {
       return;
     }
     
-    if (user.role !== 'Admin') {
+    if (user.role !== 'Admin' && user.role !== 'admin') {
       router.push('/dashboard');
       return;
     }
   }, [user, token, router]);
 
-  if (!user || user.role !== 'Admin') {
+  if (!user || (user.role !== 'Admin' && user.role !== 'admin')) {
     return <div className="min-h-screen flex items-center justify-center">
       <div className="text-lg">Access denied. Admin only.</div>
     </div>;

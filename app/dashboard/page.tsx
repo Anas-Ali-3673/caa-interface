@@ -10,7 +10,11 @@ interface Ticket {
   description: string;
   status: 'open' | 'in-progress' | 'closed';
   priority: 'low' | 'medium' | 'high';
-  createdBy: string;
+  createdBy: {
+    _id: string;
+    name?: string;
+    email: string;
+  } | string;
   createdAt: string;
   updatedAt: string;
 }
@@ -41,9 +45,10 @@ export default function Dashboard() {
   // Fetch tickets
   useEffect(() => {
     const fetchTickets = async () => {
-      if (!token) return;
+      if (!token || !user) return;
       
       try {
+        console.log('Fetching tickets for user:', user.role, user._id);
         const response = await fetch(`${API_BASE_URL}/api/tickets`, {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -51,13 +56,18 @@ export default function Dashboard() {
           },
         });
 
+        console.log('Response status:', response.status);
         if (!response.ok) {
-          throw new Error('Failed to fetch tickets');
+          const errorText = await response.text();
+          console.error('API Error:', errorText);
+          throw new Error(`Failed to fetch tickets: ${response.status}`);
         }
 
         const data = await response.json();
+        console.log('Received tickets:', data);
         setTickets(data);
       } catch (err) {
+        console.error('Fetch error:', err);
         setError(err instanceof Error ? err.message : 'Failed to fetch tickets');
       } finally {
         setLoading(false);
@@ -65,7 +75,7 @@ export default function Dashboard() {
     };
 
     fetchTickets();
-  }, [token]);
+  }, [token, user]);
 
   const createTicket = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,7 +105,7 @@ export default function Dashboard() {
   };
 
   const updateTicketStatus = async (ticketId: string, status: string) => {
-    if (!token || user?.role !== 'admin') {
+    if (!token || user?.role !== 'Admin') {
       setError('Only admins can update ticket status');
       return;
     }
@@ -213,18 +223,20 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Create Ticket Button */}
-        <div className="mb-6">
-          <button
-            onClick={() => setShowCreateForm(true)}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium"
-          >
-            Create New Ticket
-          </button>
-        </div>
+        {/* Create Ticket Button - Users Only */}
+        {user.role !== 'Admin' && (
+          <div className="mb-6">
+            <button
+              onClick={() => setShowCreateForm(true)}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium"
+            >
+              Create New Ticket
+            </button>
+          </div>
+        )}
 
-        {/* Create Ticket Form */}
-        {showCreateForm && (
+        {/* Create Ticket Form - Users Only */}
+        {user.role !== 'admin' && showCreateForm && (
           <div className="mb-6 bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-medium mb-4">Create New Ticket</h2>
             <form onSubmit={createTicket} className="space-y-4">
@@ -237,7 +249,7 @@ export default function Dashboard() {
                   required
                   value={newTicket.title}
                   onChange={(e) => setNewTicket(prev => ({...prev, title: e.target.value}))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-600"
                 />
               </div>
               
@@ -250,7 +262,7 @@ export default function Dashboard() {
                   rows={3}
                   value={newTicket.description}
                   onChange={(e) => setNewTicket(prev => ({...prev, description: e.target.value}))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none text-gray-600 focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
               
@@ -261,7 +273,7 @@ export default function Dashboard() {
                 <select
                   value={newTicket.priority}
                   onChange={(e) => setNewTicket(prev => ({...prev, priority: e.target.value as any}))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -285,6 +297,25 @@ export default function Dashboard() {
                 </button>
               </div>
             </form>
+          </div>
+        )}
+
+        {/* Admin View Info */}
+        {user.role === 'admin' && (
+          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-md p-4">
+            <div className="flex items-center">
+              <svg className="h-5 w-5 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+              <div>
+                <p className="text-sm font-medium text-blue-800">
+                  Admin View: You can see and manage all users' tickets
+                </p>
+                <p className="text-xs text-blue-600 mt-1">
+                  Total tickets: {tickets.length}
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -315,6 +346,11 @@ export default function Dashboard() {
                       
                       <div className="mt-3 flex items-center space-x-4 text-sm text-gray-500">
                         <span>Created: {new Date(ticket.createdAt).toLocaleDateString()}</span>
+                        {user.role === 'admin' && typeof ticket.createdBy === 'object' && (
+                          <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
+                            By: {ticket.createdBy.name || ticket.createdBy.email}
+                          </span>
+                        )}
                         <span className={`px-2 py-1 rounded text-xs font-medium ${
                           ticket.priority === 'high' ? 'bg-red-100 text-red-800' :
                           ticket.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
@@ -334,13 +370,13 @@ export default function Dashboard() {
                     
                     <div className="ml-4 flex flex-col space-y-2">
                       {/* Status Update - Admin Only */}
-                      {user.role === 'admin' ? (
+                      {user.role === 'Admin' ? (
                         <div className="flex items-center space-x-2">
                           <span className="text-xs text-gray-500">Status:</span>
                           <select
                             value={ticket.status}
                             onChange={(e) => updateTicketStatus(ticket._id, e.target.value)}
-                            className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="text-sm border border-gray-300 rounded px-2 py-1 text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                           >
                             <option value="open">Open</option>
                             <option value="in-progress">In Progress</option>
@@ -354,7 +390,8 @@ export default function Dashboard() {
                       )}
                       
                       {/* Delete Button - Admin or Creator */}
-                      {(user.role === 'admin' || ticket.createdBy === user._id) && (
+                      {(user.role === 'admin' || 
+                        (typeof ticket.createdBy === 'string' ? ticket.createdBy === user._id : ticket.createdBy._id === user._id)) && (
                         <button
                           onClick={() => deleteTicket(ticket._id)}
                           className="text-red-600 hover:text-red-800 text-sm font-medium"

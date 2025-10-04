@@ -31,7 +31,7 @@ export default function AdminPanel() {
       return;
     }
     
-    if (user.role !== 'admin') {
+    if (user.role !== 'Admin') {
       router.push('/dashboard');
       return;
     }
@@ -40,7 +40,7 @@ export default function AdminPanel() {
   // Fetch audit logs
   useEffect(() => {
     const fetchAuditLogs = async () => {
-      if (!token || user?.role !== 'admin') return;
+      if (!token || user?.role !== 'Admin') return;
       
       try {
         const response = await fetch(`${API_BASE_URL}/audit/logs`, {

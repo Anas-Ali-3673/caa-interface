@@ -95,7 +95,10 @@ export default function Dashboard() {
   };
 
   const updateTicketStatus = async (ticketId: string, status: string) => {
-    if (!token) return;
+    if (!token || user?.role !== 'admin') {
+      setError('Only admins can update ticket status');
+      return;
+    }
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/tickets/${ticketId}`, {
@@ -329,19 +332,28 @@ export default function Dashboard() {
                       </div>
                     </div>
                     
-                    <div className="ml-4 flex space-x-2">
-                      {ticket.status !== 'closed' && (
-                        <select
-                          value={ticket.status}
-                          onChange={(e) => updateTicketStatus(ticket._id, e.target.value)}
-                          className="text-sm border border-gray-300 rounded px-2 py-1"
-                        >
-                          <option value="open">Open</option>
-                          <option value="in-progress">In Progress</option>
-                          <option value="closed">Closed</option>
-                        </select>
+                    <div className="ml-4 flex flex-col space-y-2">
+                      {/* Status Update - Admin Only */}
+                      {user.role === 'admin' ? (
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs text-gray-500">Status:</span>
+                          <select
+                            value={ticket.status}
+                            onChange={(e) => updateTicketStatus(ticket._id, e.target.value)}
+                            className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          >
+                            <option value="open">Open</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="closed">Closed</option>
+                          </select>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-gray-500">
+                          Status: <span className="font-medium capitalize">{ticket.status.replace('-', ' ')}</span>
+                        </div>
                       )}
                       
+                      {/* Delete Button - Admin or Creator */}
                       {(user.role === 'admin' || ticket.createdBy === user._id) && (
                         <button
                           onClick={() => deleteTicket(ticket._id)}

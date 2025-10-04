@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useMemo } from 'react';
+
 interface AuditLog {
   _id: string;
   userId: string | { _id: string; name?: string; email: string };
@@ -13,7 +15,22 @@ interface AuditLogsProps {
   auditLogs: AuditLog[];
 }
 
+const LOGS_PER_PAGE = 2;
+
 export default function AuditLogs({ auditLogs }: AuditLogsProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(auditLogs.length / LOGS_PER_PAGE);
+  
+  const paginatedLogs = useMemo(() => {
+    const startIndex = (currentPage - 1) * LOGS_PER_PAGE;
+    const endIndex = startIndex + LOGS_PER_PAGE;
+    return auditLogs.slice(startIndex, endIndex);
+  }, [auditLogs, currentPage]);
+
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  };
   return (
     <div className="bg-white rounded-lg shadow">
       <div className="px-6 py-4 border-b border-gray-200">
@@ -31,8 +48,9 @@ export default function AuditLogs({ auditLogs }: AuditLogsProps) {
             No audit logs found
           </div>
         ) : (
-          <div className="space-y-4">
-            {auditLogs.map((log) => (
+          <>
+            <div className="space-y-4">
+              {paginatedLogs.map((log) => (
               <div key={log._id} className="border border-gray-200 rounded-lg p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -68,8 +86,51 @@ export default function AuditLogs({ auditLogs }: AuditLogsProps) {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="mt-6 flex items-center justify-between border-t pt-4">
+                <div className="text-sm text-gray-600">
+                  Showing {((currentPage - 1) * LOGS_PER_PAGE) + 1} to {Math.min(currentPage * LOGS_PER_PAGE, auditLogs.length)} of {auditLogs.length} logs
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 text-sm border rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Previous
+                  </button>
+                  
+                  <div className="flex items-center space-x-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => goToPage(page)}
+                        className={`px-3 py-1 text-sm border rounded ${
+                          currentPage === page
+                            ? 'bg-indigo-600 text-white border-indigo-600'
+                            : 'hover:bg-gray-50'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <button
+                    onClick={() => goToPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1 text-sm border rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

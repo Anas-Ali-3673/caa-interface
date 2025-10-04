@@ -101,25 +101,25 @@ export const authAPI = {
 
 export const ticketsAPI = {
   getAll: (token: string) =>
-    apiClient.get('/tickets', token),
+    apiClient.get('/api/tickets', token),
   
   create: (ticket: { title: string; description: string; priority: string }, token: string) =>
-    apiClient.post('/tickets', ticket, token),
-  
+    apiClient.post('/api/tickets', ticket, token),
+
   update: (id: string, updates: any, token: string) =>
-    apiClient.patch(`/tickets/${id}`, updates, token),
-  
+    apiClient.patch(`/api/tickets/${id}`, updates, token),
+
   delete: (id: string, token: string) =>
-    apiClient.delete(`/tickets/${id}`, token),
+    apiClient.delete(`/api/tickets/${id}`, token),
 };
 
 export const auditAPI = {
   getLogs: (token: string) =>
-    apiClient.get('/audit/logs', token),
+    apiClient.get('/api/audit/logs', token),
   
   getDatabaseStatus: (token: string) =>
-    apiClient.get('/audit/database/status', token),
-  
+    apiClient.get('/api/audit/database/status', token),
+
   toggleDatabase: (down: boolean, token: string) =>
-    apiClient.post('/audit/database/toggle', { down }, token),
+    apiClient.post('/api/audit/database/toggle', { down }, token),
 };

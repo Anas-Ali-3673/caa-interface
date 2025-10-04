@@ -18,7 +18,7 @@ interface Ticket {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 export default function Dashboard() {
-  const { user, token, logout } = useAuth();
+  const { user, token, logout, isLoading: authLoading } = useAuth();
   const router = useRouter();
   
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -33,10 +33,10 @@ export default function Dashboard() {
 
   // Redirect if not authenticated
   useEffect(() => {
-    if (!user || !token) {
+    if (!authLoading && (!user || !token)) {
       router.push('/sign-in');
     }
-  }, [user, token, router]);
+  }, [user, token, router, authLoading]);
 
   // Fetch tickets
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function Dashboard() {
       if (!token) return;
       
       try {
-        const response = await fetch(`${API_BASE_URL}/tickets`, {
+        const response = await fetch(`${API_BASE_URL}/api/tickets`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ export default function Dashboard() {
     if (!token) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/tickets`, {
+      const response = await fetch(`${API_BASE_URL}/api/tickets`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -98,7 +98,7 @@ export default function Dashboard() {
     if (!token) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/tickets/${ticketId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/tickets/${ticketId}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -126,7 +126,7 @@ export default function Dashboard() {
     if (!confirm('Are you sure you want to delete this ticket?')) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/tickets/${ticketId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/tickets/${ticketId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -142,6 +142,12 @@ export default function Dashboard() {
       setError(err instanceof Error ? err.message : 'Failed to delete ticket');
     }
   };
+
+  if (authLoading) {
+    return <div className="min-h-screen flex items-center justify-center">
+      <div className="text-lg">Loading...</div>
+    </div>;
+  }
 
   if (!user || !token) {
     return <div className="min-h-screen flex items-center justify-center">

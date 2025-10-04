@@ -17,19 +17,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Check for existing token on app load
   useEffect(() => {
-    const storedToken = localStorage.getItem('auth-token');
-    const storedUser = localStorage.getItem('auth-user');
-    
-    if (storedToken && storedUser) {
-      try {
-        setToken(storedToken);
-        setUser(JSON.parse(storedUser));
-      } catch (err) {
-        localStorage.removeItem('auth-token');
-        localStorage.removeItem('auth-user');
+    const initAuth = () => {
+      const storedToken = localStorage.getItem('auth-token');
+      const storedUser = localStorage.getItem('auth-user');
+      
+      if (storedToken && storedUser) {
+        try {
+          const userData = JSON.parse(storedUser);
+          setToken(storedToken);
+          setUser(userData);
+        } catch (err) {
+          localStorage.removeItem('auth-token');
+          localStorage.removeItem('auth-user');
+        }
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+
+    initAuth();
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -51,13 +56,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       const data = await response.json();
+      console.log('Login response:', data);
+      
+      // Extract user data (remove accessToken from user object)
+      const { accessToken, ...userData } = data;
       
       // Store auth data
-      localStorage.setItem('auth-token', data.access_token);
-      localStorage.setItem('auth-user', JSON.stringify(data.user));
+      localStorage.setItem('auth-token', accessToken);
+      localStorage.setItem('auth-user', JSON.stringify(userData));
       
-      setToken(data.access_token);
-      setUser(data.user);
+      setToken(accessToken);
+      setUser(userData);
+      console.log('Auth state updated:', { token: accessToken, user: userData });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
       throw err;

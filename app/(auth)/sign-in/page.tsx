@@ -58,8 +58,10 @@ export default function SignInPage() {
 
     try {
       await login(result.data.email, result.data.password);
+      console.log('Login successful, redirecting to dashboard');
       router.push('/dashboard');
     } catch (err) {
+      console.error('Login failed:', err);
       setErrors({ email: 'Invalid credentials. Please try again.' });
     }
   };

@@ -27,18 +27,34 @@ This is the frontend interface for the CAA (Confidentiality, Availability, Accou
 ```
 app/
 ├── (auth)/
-│   ├── sign-in/         # Login page (note: use /login for now due to file issues)
-│   └── sign-up/         # Signup page
-├── admin/               # Admin panel for audit logs and DB controls
-├── dashboard/           # Main tickets dashboard
-├── login/               # Alternative login page
+│   ├── sign-in/
+│   │   └── page.tsx                    # Sign-in page with authentication
+│   └── sign-up/
+│       └── page.tsx                    # Sign-up page with registration
+├── admin/
+│   ├── components/
+│   │   ├── AdminHeader.tsx             # Admin panel header
+│   │   ├── AuditLogs.tsx               # Audit logs display with pagination
+│   │   ├── DatabaseControl.tsx         # Database availability controls
+│   │   ├── ErrorDisplay.tsx            # Reusable error display component
+│   │   └── SecuritySummary.tsx         # Security features summary
+│   ├── hooks/
+│   │   └── useAdminData.ts             # Custom hook for admin data management
+│   └── page.tsx                        # Admin panel main page
+├── dashboard/
+│   ├── components/
+│   │   ├── CreateTicketForm.tsx        # Ticket creation form
+│   │   ├── DashboardHeader.tsx         # Dashboard header with navigation
+│   │   └── TicketsList.tsx             # Tickets list with admin/user views
+│   └── page.tsx                        # Main dashboard page
 ├── context/
-│   ├── authContext.ts   # Authentication context definitions
-│   └── AuthProvider.tsx # Authentication provider component
+│   ├── authContext.ts                  # Authentication context definitions
+│   └── AuthProvider.tsx                # Authentication provider with API integration
 ├── lib/
-│   └── api.ts          # API client and helper functions
-├── layout.tsx          # Root layout with AuthProvider
-└── page.tsx            # Home page with auto-redirect
+│   ├── api.ts                          # API client and helper functions
+│   └── auth.ts                         # Authentication utilities
+├── layout.tsx                          # Root layout with AuthProvider
+└── page.tsx                            # Home page with auto-redirect
 
 ```
 
@@ -46,7 +62,7 @@ app/
 
 ### Prerequisites
 - Node.js 18+ and npm
-- Backend server running on port 3001 (adjust in .env.local if different)
+- Backend server running on port 3000 (adjust in .env.local if different)
 
 ### Installation
 
@@ -58,7 +74,7 @@ npm install
 2. Set up environment variables:
 ```bash
 # Create .env.local file
-echo "NEXT_PUBLIC_API_URL=http://localhost:3001" > .env.local
+echo "NEXT_PUBLIC_API_URL=http://localhost:3000" > .env.local
 ```
 
 3. Start the development server:
@@ -152,15 +168,17 @@ For testing purposes, use these credentials (ensure they exist in your backend):
 
 ### Common Issues
 
-1. **Login Issues**: Ensure backend is running on correct port (default: 3001)
+1. **Login Issues**: Ensure backend is running on correct port (default: 3000)
 2. **CORS Errors**: Check backend CORS configuration allows frontend origin
 3. **API Errors**: Verify environment variables and network connectivity
-4. **Route Issues**: Use /login if /sign-in has file corruption issues
+4. **Role Case Sensitivity**: Backend returns 'Admin' role, frontend handles both 'Admin' and 'admin'
 
 ### Development Notes
 
-- Some files may have corruption issues due to git/filesystem conflicts
-- Use alternative routes (/login instead of /sign-in) if needed
+- Component-based architecture for better maintainability
+- Custom hooks for data fetching and state management
+- Reusable components across admin and dashboard pages
+- Type-safe with TypeScript interfaces
 - Check browser console for detailed error messages
 - Ensure backend API is running and accessible
 
@@ -171,11 +189,29 @@ npm run build
 npm start
 ```
 
+## Architecture Highlights
+
+### Component Structure
+- **Modular Components**: Separated into smaller, reusable components
+- **Custom Hooks**: useAdminData for admin-specific data management
+- **Shared Components**: ErrorDisplay used across multiple pages
+- **Type Safety**: Full TypeScript support with proper interfaces
+
+### Features Implemented
+- ✅ JWT-based authentication with auto-login
+- ✅ Role-based access control (Admin/User)
+- ✅ Pagination for audit logs (10 items per page)
+- ✅ Real-time ticket management
+- ✅ Database failover simulation
+- ✅ Complete audit trail
+- ✅ Form validation with Zod
+- ✅ Responsive design with Tailwind CSS
+
 ## Next Steps
 
-- Add proper form validation with schema libraries
-- Implement proper error boundaries and loading states
 - Add unit and integration tests
-- Enhance UI/UX with animations and better styling
+- Implement real-time updates with WebSockets
+- Add ticket filtering and search functionality
+- Enhance UI/UX with animations
 - Add proper logging and monitoring
-- Implement proper session management and refresh tokens
+- Implement refresh token mechanism

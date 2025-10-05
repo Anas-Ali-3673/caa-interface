@@ -52,7 +52,7 @@ export default function SignUpPage() {
     
     if (!result.success) {
       const fieldErrors: FormErrors = {};
-      result.error.issues.forEach((err: { path: (string | number)[]; message: string }) => {
+      result.error.issues.forEach((err) => {
         if (err.path[0]) {
           fieldErrors[err.path[0] as keyof FormErrors] = err.message;
         }
